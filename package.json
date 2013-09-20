@@ -10,7 +10,10 @@
     "type": "git",
     "url": "git://github.com/Nomon/backbone-promises.git"
   },
-  "author": "Nomon",
+  "author": {
+    "name": "nomon",
+    "email": "matti@applifier.com"
+  },
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.13.0",
