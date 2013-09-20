@@ -15,10 +15,11 @@ var MyModel = Model.extend({
 
 var a = new MyModel({id:1,abc:1});
 a.save().then(function() {
-
   var b = new MyModel({id:1});
   b.fetch().then(function() {
     console.log (a.get('abc') == b.get('abc'))
+  }, function(err) {
+    console.error(err);
   });
 }, function(err) {
   console.error(err);

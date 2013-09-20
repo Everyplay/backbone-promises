@@ -1,19 +1,21 @@
 var assert = require('assert');
-var Model = require('../').Model;
 var Backbone = require('backbone');
+var Model = require('../').Model;
+var Collection = require('../').Collection;
 var Db = require('backbone-db');
-var Deferred = require('../');
 var debug = require('debug')('deferred');
-var db = new Db("test");
 
-Backbone.sync = Db.sync;
+var db = new Db("test.model");
 
-var MyModel = Deferred.Model.extend({
+var MyModel = Model.extend({
   db: db,
   sync: Db.sync,
   url: function() {
-    if(this.isNew()) return "mymodel";
-    return "mymodel:"+this.get(this.idAttribute);
+    if(this.isNew()) {
+      return '/mymodels';
+    } else {
+      return '/mymodels/'+this.get(this.idAttribute)
+    }
   }
 });
 
@@ -22,8 +24,11 @@ describe('#Model', function() {
     var m = new MyModel({id:1});
     m.save().then(function() {
       t();
-    }, assert);
-  })
+    }, function() {
+      assert(false);
+    });
+  });
+
   it('should have deferred .save and .fetch', function(t) {
     var m = new MyModel({id:2,"test":"a"});
     m.save().then(function(a) {
@@ -31,14 +36,18 @@ describe('#Model', function() {
       m2.fetch().then(function(model) {
         assert(model.get("test") == "a");
         t();
-      }, assert);
-    }, assert);
+      }, function() {
+        assert(false);
+      });
+    }, function() {
+      assert(false);
+    });
   });
 
   it('Should maintain classic behaviour', function(t) {
-    var m = new MyModel({id:1,"test":"a"});
+    var m = new MyModel({id:3,"test":"a"});
     m.save({variable:"123"},{success: function() {
-      var m2 = new MyModel({id:1});
+      var m2 = new MyModel({id:3});
       m2.fetch({success: function() {
         assert.equal(m2.get("variable"),"123");
         assert.equal(m2.get("test"),"a")

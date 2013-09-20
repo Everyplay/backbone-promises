@@ -13,7 +13,8 @@
   "author": "Nomon",
   "license": "MIT",
   "devDependencies": {
-    "mocha": "~1.13.0"
+    "mocha": "~1.13.0",
+    "backbone-db": "~0.0.1"
   },
   "dependencies": {
     "backbone": "~1.0.0",

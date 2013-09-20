@@ -6,7 +6,7 @@ var Backbone = require('backbone');
 var Db = require('backbone-db');
 var debug = require('debug')('deferred');
 
-var db = Db("mymodels");
+var db = Db("mycol");
 
 var MyModel = Model.extend({
   db: db,
@@ -36,7 +36,9 @@ describe('#Collection', function() {
     a.create({id:1,data:"xyz"}).then(function(m) {
       assert(m.get("data") == "xyz");
       t();
-    }, assert);
+    }, function() {
+      assert(false);
+    });
   });
 
   it('should have deferred .fetch', function(t) {

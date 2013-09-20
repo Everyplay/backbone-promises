@@ -4,37 +4,30 @@ var debug = require('debug')('backbone-promises');
 var when = require('when');
 
 function bbPromise(opt, deferred) {
-  var fn = function(err, res) {
-    var args = [].slice.apply(arguments);
+  opt = opt || {};
+  var success = opt.success;
+  var error = opt.error;
+  opt.success = function() {
+    if(success) success.apply(this, arguments);
     if(typeof opt === "function") {
-      opt(err, res);
+      var args = [].slice.call(arguments);
+      args.unshift(null);
+      opt.apply(this, args);
     }
-    if(err) {
-      if(opt && opt.error) opt.error(err);
-      deferred.resolver.reject(err);
-      opt = null;
-    } else {
-      if(opt && opt.success) opt.success.apply(this, arguments);
-      deferred.resolver.resolve(args);
-      opt = null;
-    }
+    deferred.resolve.apply(this, arguments);
   };
-
-  fn.error = function(err) {
-    fn(err);
+  opt.error = function() {
+    if(success) error.apply(this, arguments);
+    if(typeof opt === "function") opt.apply(this, arguments);
+    deferred.reject.apply(this, arguments);
   };
-  fn.success = function() {
-    var args = [].slice.apply(arguments);
-    args.unshift(null);
-    fn.apply(this, args);
-  }
-  // yeolde compatability
-  fn.fail = fn.error;
-  fn.done = fn.success;
-  return fn;
+  return opt;
 }
 
 var Model = exports.Model = Backbone.Model.extend({
+  constructor: function() {
+    return Backbone.Model.apply(this, arguments)
+  },
   save: function(key, val, options) {
     var deferred = when.defer();
     if(!options && (typeof val === "object" || typeof val === "undefined" || typeof val === "function")) {
@@ -54,6 +47,9 @@ var Model = exports.Model = Backbone.Model.extend({
 });
 
 var Collection = exports.Collection = Backbone.Collection.extend({
+  constructor: function() {
+    Backbone.Collection.apply(this, arguments);
+  },
   create: function(model, options) {
     var deferred = when.defer();
     options = bbPromise(options, deferred);
