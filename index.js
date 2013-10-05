@@ -1,65 +1,73 @@
 var _ = require('underscore');
 var Backbone = require('backbone');
 var debug = require('debug')('backbone-promises');
-var when = require('when');
+var whenLib = require('when');
 
-function bbPromise(opt, deferred) {
-  opt = opt || {};
-  var success = opt.success;
-  var error = opt.error;
-  opt.success = function() {
-    if(success) success.apply(this, arguments);
-    if(typeof opt === "function") {
-      var args = [].slice.call(arguments);
-      args.unshift(null);
-      opt.apply(this, args);
-    }
-    deferred.resolve.apply(this, arguments);
-  };
-  opt.error = function() {
-    if(success) error.apply(this, arguments);
-    if(typeof opt === "function") opt.apply(this, arguments);
-    deferred.reject.apply(this, arguments);
-  };
-  return opt;
-}
 
 var Model = exports.Model = Backbone.Model.extend({
   constructor: function() {
     return Backbone.Model.apply(this, arguments)
   },
   save: function(key, val, options) {
-    var deferred = when.defer();
-    if(!options && (typeof val === "object" || typeof val === "undefined" || typeof val === "function")) {
-      val = bbPromise(val, deferred);
+    var opt;
+    if(!options && (typeof val === "object" || typeof val === "undefined")) {
+      debug('wrapping val');
+      opt = val = Promises.wrap(val);
     } else {
-      options = bbPromise(options, deferred);
+      opt = options = Promises.wrap(options);
     }
     Backbone.Model.prototype.save.call(this, key, val, options);
-    return deferred.promise;
+    debug('saved');
+    return opt.promise;
   },
   fetch: function(options) {
-    var deferred = when.defer();
-    options = bbPromise(options, deferred);
+    options = Promises.wrap(options);
     Backbone.Model.prototype.fetch.call(this, options);
-    return deferred.promise;
+    return options.promise;
   }
 });
 
 var Collection = exports.Collection = Backbone.Collection.extend({
-  constructor: function() {
+  constructor:function () {
     Backbone.Collection.apply(this, arguments);
   },
-  create: function(model, options) {
-    var deferred = when.defer();
-    options = bbPromise(options, deferred);
+  create :function (model, options) {
+    debug('Collection.create');
+    options = Promises.wrap(options);
     Backbone.Collection.prototype.create.call(this, model, options);
-    return deferred.promise;
+    return options.promise;
   },
-  fetch: function(options) {
-    var deferred = when.defer();
-    options = bbPromise(options, deferred);
+  fetch:function (options) {
+    debug('Collection.fetch');
+    options = Promises.wrap(options);
     Backbone.Collection.prototype.fetch.call(this, options);
-    return deferred.promise;
+    return options.promise;
   }
 });
+
+var Promises = _.extend(Backbone.Events, {
+  when: whenLib,
+  defer: whenLib.defer,
+  wrap: function(opt) {
+    opt = opt || {};
+    var deferred = whenLib.defer();
+    var success = opt.success;
+    var error = opt.error;
+    opt.success = function() {
+      if(success) success.apply(success, arguments);
+      debug("resolving");
+      deferred.resolve.apply(deferred, arguments);
+    };
+    opt.error = function() {
+      if(error) error.apply(error, arguments);
+      debug("rejecting");
+      deferred.reject.apply(deferred, arguments);
+    };
+    opt.promise = deferred.promise;
+    return opt;
+  },
+  Model: Model,
+  Collection: Collection
+});
+
+Backbone.Promises = module.exports = Promises;

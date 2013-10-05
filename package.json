@@ -17,7 +17,8 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.13.0",
-    "backbone-db": "~0.0.1"
+    "backbone-db": "~0.0.1",
+    "chai": "~1.8.0"
   },
   "dependencies": {
     "backbone": "~1.0.0",

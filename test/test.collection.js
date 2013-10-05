@@ -1,12 +1,13 @@
 
 var assert = require('assert');
+var Backbone = require('backbone');
 var Model = require('../').Model;
 var Collection = require('../').Collection;
-var Backbone = require('backbone');
 var Db = require('backbone-db');
-var debug = require('debug')('deferred');
-
+var debug = require('debug')('promises');
+var when = require('../').when;
 var db = Db("mycol");
+var expect = require('chai').expect
 
 var MyModel = Model.extend({
   db: db,
@@ -33,12 +34,15 @@ var MyCollection = Collection.extend({
 describe('#Collection', function() {
   it('should have deferred .create', function(t) {
     var a = new MyCollection();
-    a.create({id:1,data:"xyz"}).then(function(m) {
-      assert(m.get("data") == "xyz");
+    var m1 = a.create({id:1,data:"xyz"});
+    var m2 = a.create({id:2,data:"zyx"});
+    var m3 = a.create({id:3,data:""});
+    Backbone.Promises.when.join(m1,m2,m3).then(function(values) {
+      assert(values[0].get('data') == "xyz");
+      assert(values[1].get('data') == "zyx");
+      assert(values[2].get('data') == "");
       t();
-    }, function() {
-      assert(false);
-    });
+    },assert).otherwise(assert);
   });
 
   it('should have deferred .fetch', function(t) {
@@ -47,5 +51,4 @@ describe('#Collection', function() {
       t();
     }, assert);
   });
-
 });

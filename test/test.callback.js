@@ -29,7 +29,9 @@ var MyCollection = Deferred.Collection.extend({
 describe('#Deferred call styles', function() {
   it('Should allow classic style', function(t) {
     var m = new MyModel({id:1});
+    debug('saving null options');
     m.save(null, {success: function() {
+      debug('done');
       var ma = new MyModel({id:1});
       ma.fetch({
         success: function() {
@@ -45,9 +47,8 @@ describe('#Deferred call styles', function() {
         }, error: assert
       })
     },error: assert});
-
   });
-  it('Should allow classic style with deferred', function(t) {
+  it('Should allow classic style with Promises/A+', function(t) {
     var m = new MyModel({id:1});
     m.save().then(function() {
       var ma = new MyModel({id:1});
@@ -58,20 +59,6 @@ describe('#Deferred call styles', function() {
       });
     }, function() {
       assert(false);
-    });
-  });
-  it('Should allow node.js style callbacks', function(t) {
-    var m = new MyModel({id:1});
-    m.save({kissa:"koira"}, function(err, res) {
-      assert(err == null);
-      assert(res != null);
-      var m2 = new MyModel(m.toJSON());
-      m2.fetch(function(err, res) {
-        assert(err == null);
-        assert(res != null);
-        assert(m2.get("kissa") == "koira")
-        t();
-      });
     });
   });
 });

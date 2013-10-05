@@ -1,7 +1,8 @@
-var Model = require('../').Model;
+var Collection = require('../').Model;
 var Db = require('backbone-db');
+var Promises = require('../');
 
-var MyModel = Model.extend({
+var MyModel = Promises.Model.extend({
   db:Db("mymodel"),
   sync:Db.sync,
   url: function() {
@@ -12,15 +13,19 @@ var MyModel = Model.extend({
     }
   }
 });
+module.exports = MyModel;
 
-var a = new MyModel({id:1,abc:1});
-a.save().then(function() {
-  var b = new MyModel({id:1});
-  b.fetch().then(function() {
-    console.log (a.get('abc') == b.get('abc'))
+if(!module.parent) {
+  var a = new MyModel({id:1,abc:1});
+  a.save().then(function() {
+    var b = new MyModel({id:1});
+    b.fetch().then(function() {
+      console.log (a.get('abc') == b.get('abc'))
+    }, function(err) {
+      console.error(err);
+    });
   }, function(err) {
     console.error(err);
   });
-}, function(err) {
-  console.error(err);
-});
+
+}
