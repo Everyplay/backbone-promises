@@ -64,5 +64,26 @@ describe('#Model', function() {
       }});
     }});
   });
-
+  it('Should create empty model and accept variables in .save', function(t) {
+    var m = new MyModel();
+    m.save({id:123}).then(function() {
+      assert.equal(m.get("id"), 123);
+      t();
+    }, function() {
+      assert.ok(false)
+    });
+  });
+  it('Should be destroyable.', function() {
+    var m = new MyModel();
+    m.save({id:123,asd:"asd"}).then(function() {
+      assert.equal(m.get("id"), 123);
+      m.fetch().then(function() {
+        assert.ok(false);
+      }).otherwise(function() {
+          t();
+      });
+    }, function() {
+      assert.ok(false)
+    });
+  })
 });

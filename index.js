@@ -21,8 +21,15 @@ var Model = exports.Model = Backbone.Model.extend({
     return opt.promise;
   },
   fetch: function(options) {
+    debug('Model.Fetch');
     options = Promises.wrap(options);
     Backbone.Model.prototype.fetch.call(this, options);
+    return options.promise;
+  },
+  destroy: function(options) {
+    debug('Model.Destroy');
+    options = Promises.wrap(options);
+    Backbone.Model.prototype.destroy.call(this, options);
     return options.promise;
   }
 });
