@@ -85,5 +85,17 @@ describe('#Model', function() {
     }, function() {
       assert.ok(false)
     });
-  })
+  });
+
+  it('Should reject .save() promise on failed validation', function(done) {
+    var m = new MyModel();
+    m.validate = function() {
+      return new Error('failed validating');
+    };
+    m.save({id:123, variable:"test"}).then(function() {
+      assert.fail();
+    }, function() {
+      done();
+    }).otherwise(done);
+  });
 });

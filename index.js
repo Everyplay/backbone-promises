@@ -16,7 +16,10 @@ var Model = exports.Model = Backbone.Model.extend({
     } else {
       opt = options = Promises.wrap(options);
     }
-    Backbone.Model.prototype.save.call(this, key, val, options);
+    var validated = Backbone.Model.prototype.save.call(this, key, val, options);
+    if(validated === false) {
+      opt.deferred.reject(opt.validationError || new Error('Validation failed'));
+    }
     debug('saved');
     return opt.promise;
   },
@@ -61,16 +64,17 @@ var Promises = _.extend(Backbone.Events, {
     var success = opt.success;
     var error = opt.error;
     opt.success = function() {
-      if(success) success.apply(success, arguments);
+      if(success) success.apply(null, arguments);
       debug("resolving");
-      deferred.resolve.apply(deferred, arguments);
+      deferred.resolve.apply(null, arguments);
     };
     opt.error = function() {
-      if(error) error.apply(error, arguments);
+      if(error) error.apply(null, arguments);
       debug("rejecting");
-      deferred.reject.apply(deferred, arguments);
+      deferred.reject.apply(null, arguments);
     };
     opt.promise = deferred.promise;
+    opt.deferred = deferred;
     return opt;
   },
   Model: Model,
