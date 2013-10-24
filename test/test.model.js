@@ -64,6 +64,7 @@ describe('#Model', function() {
       }});
     }});
   });
+
   it('Should create empty model and accept variables in .save', function(t) {
     var m = new MyModel();
     m.save({id:123}).then(function() {
@@ -73,18 +74,19 @@ describe('#Model', function() {
       assert.ok(false)
     });
   });
+
   it('Should be destroyable.', function(t) {
     var m = new MyModel();
     m.save({id:123,asd:"asd"}).then(function() {
       assert.equal(m.get("id"), 123);
-      m.fetch().then(function() {
-        assert.ok(false);
+      m.destroy().then(function() {
+        t();
       }).otherwise(function() {
-          t();
-      });
+        assert.ok(false);
+      }).otherwise(t);
     }, function() {
-      assert.ok(false)
-    });
+      assert.ok(false);
+    }).otherwise(t);
   });
 
   it('Should reject .save() promise on failed validation', function(done) {
