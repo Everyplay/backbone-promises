@@ -68,10 +68,13 @@ var Promises = _.extend(Backbone.Events, {
       debug("resolving");
       deferred.resolve.apply(null, arguments);
     };
-    opt.error = function() {
-      if(error) error.apply(null, arguments);
+
+    opt.error = function(model, err, resp) {
+      deferred.reject(err);
+      if(error) {
+        error.apply(model, err, resp);
+      }
       debug("rejecting");
-      deferred.reject.apply(null, arguments);
     };
     opt.promise = deferred.promise;
     opt.deferred = deferred;
