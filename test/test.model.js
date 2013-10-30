@@ -80,7 +80,13 @@ describe('#Model', function() {
     m.save({id:123,asd:"asd"}).then(function() {
       assert.equal(m.get("id"), 123);
       m.destroy().then(function() {
-        t();
+        m.fetch().then(function() {
+            assert.ok(false);
+          },
+          function(err) {
+            assert(err instanceof(Error), 'It should return an error when not found');
+            t();
+          }).otherwise(t);
       }).otherwise(function() {
         assert.ok(false);
       }).otherwise(t);
