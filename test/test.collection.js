@@ -51,4 +51,24 @@ describe('#Collection', function() {
       t();
     }, assert);
   });
+
+  it('should handle error on .create', function(t) {
+    var ErrorModel = MyModel.extend({
+      validate: function() {
+        return "Foo error";
+      }
+    });
+    var ErrorCollection = MyCollection.extend({
+      model: ErrorModel
+    });
+    var collection = new ErrorCollection();
+    collection
+      .create({foo: 1})
+      .then(function() {
+        assert(false, 'should not allow creating model when validation fails');
+      }, function(err) {
+        assert(err);
+        t();
+      });
+  });
 });
