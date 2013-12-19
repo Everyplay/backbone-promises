@@ -6,7 +6,7 @@ var whenLib = require('when');
 
 var Model = exports.Model = Backbone.Model.extend({
   constructor: function() {
-    return Backbone.Model.apply(this, arguments)
+    return Backbone.Model.apply(this, arguments);
   },
   save: function(key, val, options) {
     var opt;
@@ -18,7 +18,12 @@ var Model = exports.Model = Backbone.Model.extend({
     }
     var validated = Backbone.Model.prototype.save.call(this, key, val, options);
     if(validated === false) {
-      opt.deferred.reject(opt.validationError || new Error('Validation failed'));
+      var err = opt.validationError || new Error('Validation failed');
+      if(opt.error) {
+        opt.error.call(this, this, err);
+      } else {
+        opt.deferred.reject(err);
+      }
     }
     debug('saved');
     return opt.promise;
@@ -72,7 +77,7 @@ var Promises = _.extend(Backbone.Events, {
     opt.error = function(model, err, resp) {
       deferred.reject(err);
       if(error) {
-        error.apply(model, err, resp);
+        error.call(this, model, err, resp);
       }
       debug("rejecting");
     };
