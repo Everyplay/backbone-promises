@@ -102,7 +102,8 @@ describe('#Model', function() {
     };
     m.save({id:123, variable:"test"}).then(function() {
       assert.fail();
-    }, function() {
+    }, function(err) {
+      assert.equal(err.message, 'failed validating');
       done();
     }).otherwise(done);
   });
