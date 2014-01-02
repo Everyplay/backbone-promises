@@ -18,7 +18,7 @@ var Model = exports.Model = Backbone.Model.extend({
     }
     var validated = Backbone.Model.prototype.save.call(this, key, val, options);
     if(validated === false) {
-      var err = opt.validationError || new Error('Validation failed');
+      var err = this.validationError || new Error('Validation failed');
       opt.error.call(this, this, err);
     }
     debug('saved');
