@@ -60,7 +60,7 @@ var Promises = _.extend(Backbone.Events, {
   when: whenLib,
   defer: whenLib.defer,
   wrap: function(opt) {
-    opt = opt || {};
+    opt = opt || {};
     var deferred = whenLib.defer();
     var success = opt.success;
     var error = opt.error;
