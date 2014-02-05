@@ -4,7 +4,8 @@ var Model = require('../').Model;
 var Collection = require('../').Collection;
 var Db = require('backbone-db');
 var debug = require('debug')('deferred');
-
+var when = require('when');
+var monitor = require('when/monitor/console');
 var db = new Db("test.model");
 
 var MyModel = Model.extend({
@@ -45,11 +46,11 @@ describe('#Model', function() {
   });
 
   it('Should maintain classic behaviour', function(t) {
-    var m = new MyModel({id:3,"test":"a"});
+    m = new MyModel({id:3,"test":"a"});
     m.save({variable:"123"},{success: function() {
-      var m2 = new MyModel({id:3});
+      m2 = new MyModel({id:3});
       m2.fetch({success: function() {
-        assert.equal(m2.get("variable"),"123");
+        assert.equal(m2. get("variable"),"123");
         assert.equal(m2.get("test"),"a")
         var maa = new MyModel({id:123123});
 
@@ -67,32 +68,28 @@ describe('#Model', function() {
 
   it('Should create empty model and accept variables in .save', function(t) {
     var m = new MyModel();
-    m.save({id:123}).then(function() {
+    m.save({id:123}).done(function() {
       assert.equal(m.get("id"), 123);
       t();
-    }, function() {
-      assert.ok(false)
-    });
+    }, t);
   });
 
   it('Should be destroyable.', function(t) {
     var m = new MyModel();
     m.save({id:123,asd:"asd"}).then(function() {
       assert.equal(m.get("id"), 123);
-      m.destroy().then(function() {
-        m.fetch().then(function() {
+      return m.destroy().then(function() {
+        return m.fetch().then(function() {
             assert.ok(false);
           },
           function(err) {
             assert(err instanceof(Error), 'It should return an error when not found');
-            t();
-          }).otherwise(t);
-      }).otherwise(function() {
-        assert.ok(false);
-      }).otherwise(t);
-    }, function() {
-      assert.ok(false);
-    }).otherwise(t);
+            return when.resolve()
+          });
+      })
+    }).done(function() {
+      t();
+    }, t);
   });
 
   it('Should reject .save() promise on failed validation', function(done) {
@@ -100,11 +97,26 @@ describe('#Model', function() {
     m.validate = function() {
       return new Error('failed validating');
     };
-    m.save({id:123, variable:"test"}).then(function() {
+    m.save({id:123, variable:"test"}).done(function() {
       assert.fail();
     }, function(err) {
       assert.equal(err.message, 'failed validating');
       done();
-    }).otherwise(done);
+    }));
+  });
+
+  it('Should yield to promise in options if it exists', function(done) {
+    var m = new MyModel();
+    var m2 = new MyModel();
+    var m3 = new MyModel();
+    when.all(m.save(),m2.save(),m3.save()).then(function() {
+      return m.fetch().then(function() {
+        return m2.fetch().then(function() {
+          return m3.fetch();
+        });
+      })
+    }).done(function() {
+      done();
+    },done);
   });
 });

@@ -37,19 +37,19 @@ describe('#Collection', function() {
     var m1 = a.create({id:1,data:"xyz"});
     var m2 = a.create({id:2,data:"zyx"});
     var m3 = a.create({id:3,data:""});
-    Backbone.Promises.when.join(m1,m2,m3).then(function(values) {
+    Backbone.Promises.when.join(m1,m2,m3).done(function(values) {
       assert(values[0].get('data') == "xyz");
       assert(values[1].get('data') == "zyx");
       assert(values[2].get('data') == "");
       t();
-    },assert).otherwise(assert);
+    },t);
   });
 
   it('should have deferred .fetch', function(t) {
     var a = new MyCollection();
-    a.fetch().then(function() {
+    a.fetch().done(function() {
       t();
-    }, assert);
+    }, t);
   });
 
   it('should handle error on .create', function(t) {
@@ -64,7 +64,7 @@ describe('#Collection', function() {
     var collection = new ErrorCollection();
     collection
       .create({foo: 1})
-      .then(function() {
+      .done(function() {
         assert(false, 'should not allow creating model when validation fails');
       }, function(err) {
         assert(err);

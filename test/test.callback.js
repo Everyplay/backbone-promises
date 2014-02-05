@@ -43,22 +43,18 @@ describe('#Deferred call styles', function() {
               t();
             }});
 
-          },error:assert})
-        }, error: assert
+          },error: t})
+        }, error: t
       })
-    },error: assert});
+    },error: t});
   });
   it('Should allow classic style with Promises/A+', function(t) {
     var m = new MyModel({id:1});
     m.save().then(function() {
       var ma = new MyModel({id:1});
-      ma.fetch().then(function() {
-        t();
-      }, function() {
-        assert(false);
-      });
-    }, function() {
-      assert(false);
-    });
+      return ma.fetch();
+    }).done(function() {
+      t();
+    }, t);
   });
 });

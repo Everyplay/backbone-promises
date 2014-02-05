@@ -71,12 +71,13 @@ var Promises = _.extend(Backbone.Events, {
     };
 
     opt.error = function(model, err, resp) {
-      deferred.reject(err);
       if(error) {
         error.call(this, model, err, resp);
       }
+      deferred.reject(err);
       debug("rejecting");
     };
+ 
     opt.promise = deferred.promise;
     opt.deferred = deferred;
     return opt;
