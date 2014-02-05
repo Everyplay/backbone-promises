@@ -21,28 +21,36 @@ var MyModel = Model.extend({
 });
 
 describe('#Model', function() {
+  it('should have chainable methods as promises', function(next) {
+    var m = new MyModel();
+    m.save({"test":123}).then(function() {
+      return m.save({"test_b":"a"}).then(function(mo) {
+        var model = new MyModel({id:mo.get(mo.idAttribute)});
+        return model.fetch();
+      })
+    }).done(function(m) {
+      assert.equal(m.get("test_b"), "a");
+      next();
+    }, next)
+  });
+  
   it('should have deferred .save', function(t) {
     var m = new MyModel({id:1});
     m.save().then(function() {
       t();
-    }, function() {
-      assert(false);
-    });
+    }, t);
   });
 
   it('should have deferred .save and .fetch', function(t) {
     var m = new MyModel({id:2,"test":"a"});
     m.save().then(function(a) {
       var m2 = new MyModel({id:2});
-      m2.fetch().then(function(model) {
+      return m2.fetch().then(function(model) {
         assert(model.get("test") == "a");
-        t();
-      }, function() {
-        assert(false);
       });
-    }, function() {
-      assert(false);
-    });
+    }).done(function() {
+      t();
+    }, t);
   });
 
   it('Should maintain classic behaviour', function(t) {
@@ -79,9 +87,7 @@ describe('#Model', function() {
     m.save({id:123,asd:"asd"}).then(function() {
       assert.equal(m.get("id"), 123);
       return m.destroy().then(function() {
-        return m.fetch().then(function() {
-            assert.ok(false);
-          },
+        return m.fetch().then(t,
           function(err) {
             assert(err instanceof(Error), 'It should return an error when not found');
             return when.resolve()
@@ -97,10 +103,10 @@ describe('#Model', function() {
     m.validate = function() {
       return new Error('failed validating');
     };
-    m.save({id:123, variable:"test"}).done(function() {
-      assert.fail();
-    }, function(err) {
+    m.save({id:123, variable:"test"}).then(done, function(err) {
       assert.equal(err.message, 'failed validating');
+      return when.resolve();
+    }).done(done, function() {
       done();
     });
   });
@@ -112,7 +118,13 @@ describe('#Model', function() {
     when.all(m.save(),m2.save(),m3.save()).then(function() {
       return m.fetch().then(function() {
         return m2.fetch().then(function() {
-          return m3.fetch();
+          return when.promise(function(resolve, reject) {
+            m3.fetch().done(function() {
+              setTimeout(function() {
+               resolve();
+              }, 1)
+            }, reject);
+          })
         });
       })
     }).done(function() {
