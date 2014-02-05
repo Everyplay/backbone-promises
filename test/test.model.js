@@ -102,7 +102,7 @@ describe('#Model', function() {
     }, function(err) {
       assert.equal(err.message, 'failed validating');
       done();
-    }));
+    });
   });
 
   it('Should yield to promise in options if it exists', function(done) {

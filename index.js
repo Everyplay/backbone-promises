@@ -9,6 +9,7 @@ var Model = exports.Model = Backbone.Model.extend({
     return Backbone.Model.apply(this, arguments);
   },
   save: function(key, val, options) {
+    debug('Model.Save');
     var opt;
     if(!options && (typeof val === "object" || typeof val === "undefined")) {
       debug('wrapping val');
@@ -16,10 +17,11 @@ var Model = exports.Model = Backbone.Model.extend({
     } else {
       opt = options = Promises.wrap(options);
     }
-    var validated = Backbone.Model.prototype.save.call(this, key, val, options);
+    var validated = Backbone.Model.prototype.save.call(this, key, val, opt);
     if(validated === false) {
-      var err = this.validationError || new Error('Validation failed');
-      opt.error.call(this, this, err);
+      var err = this.validationError || new Error('Validation failed');
+      debug('validation failed with error %s',err);
+      return opt.deferred.reject(err);
     }
     debug('saved');
     return opt.promise;
@@ -34,6 +36,7 @@ var Model = exports.Model = Backbone.Model.extend({
     debug('Model.Destroy');
     options = Promises.wrap(options);
     Backbone.Model.prototype.destroy.call(this, options);
+
     return options.promise;
   }
 });
@@ -43,7 +46,7 @@ var Collection = exports.Collection = Backbone.Collection.extend({
     Backbone.Collection.apply(this, arguments);
   },
   create :function (model, options) {
-    debug('Collection.create');
+    debug('Collection.create model');
     options = Promises.wrap(options);
     Backbone.Collection.prototype.create.call(this, model, options);
     return options.promise;
@@ -60,26 +63,33 @@ var Promises = _.extend(Backbone.Events, {
   when: whenLib,
   defer: whenLib.defer,
   wrap: function(opt) {
-    opt = opt || {};
+    opt = opt || {};
+    debug('Wrapping %s',JSON.stringify(opt));
     var deferred = whenLib.defer();
     var success = opt.success;
     var error = opt.error;
+
     opt.success = function() {
-      if(success) success.apply(null, arguments);
       debug("resolving");
       deferred.resolve.apply(null, arguments);
+      if(success) success.apply(this, arguments);
     };
 
     opt.error = function(model, err, resp) {
+      debug("rejecting");
+      deferred.reject(err);
       if(error) {
         error.call(this, model, err, resp);
       }
-      deferred.reject(err);
-      debug("rejecting");
     };
- 
-    opt.promise = deferred.promise;
-    opt.deferred = deferred;
+
+    if(opt.promise) {
+      debug('yielding promise');
+      deferred.promise.yield(opt.promise);
+    } else {
+      opt.promise = deferred.promise;
+      opt.deferred = deferred;
+    }
     return opt;
   },
   Model: Model,

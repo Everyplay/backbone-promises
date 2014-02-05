@@ -1,6 +1,6 @@
 {
   "name": "backbone-promises",
-  "version": "0.2.0",
+  "version": "0.2.2",
   "description": "Adds Promises/A+ support to backbone model and collection",
   "main": "index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "devDependencies": {
     "mocha": "~1.13.0",
-    "backbone-db": "~0.1.1",
+    "backbone-db": "~0.4.0",
     "chai": "~1.8.0"
   },
   "dependencies": {

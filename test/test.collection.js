@@ -8,6 +8,7 @@ var debug = require('debug')('promises');
 var when = require('../').when;
 var db = Db("mycol");
 var expect = require('chai').expect
+var monitor = require('when/monitor/console');
 
 var MyModel = Model.extend({
   db: db,
@@ -55,19 +56,22 @@ describe('#Collection', function() {
   it('should handle error on .create', function(t) {
     var ErrorModel = MyModel.extend({
       validate: function() {
-        return "Foo error";
+        return new Error("Foo error");
       }
     });
+
     var ErrorCollection = MyCollection.extend({
       model: ErrorModel
     });
+
     var collection = new ErrorCollection();
+
     collection
       .create({foo: 1})
       .done(function() {
-        assert(false, 'should not allow creating model when validation fails');
+        assert.ok(false, 'should not allow creating model when validation fails');
       }, function(err) {
-        assert(err);
+        assert.ok(err != null);
         t();
       });
   });
