@@ -62,7 +62,7 @@ var Promises = _.extend(Backbone.Events, {
   wrap: function(opt) {
     opt = opt || {};
 
-    var deferred = opt.deferred || whenLib.defer();
+    var deferred = whenLib.defer();
     var success = opt.success;
     var error = opt.error;
     opt.success = function() {
@@ -77,10 +77,10 @@ var Promises = _.extend(Backbone.Events, {
         error.call(this, model, err, resp);
       }
     };
-    if(!opt.deferred) {
+//    if(!opt.deferred) {
       opt.deferred = deferred;
       opt.promise = deferred.promise;
-    }
+//    }
     return opt;
   },
   Model: Model,
