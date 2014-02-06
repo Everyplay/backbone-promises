@@ -1,6 +1,6 @@
 var Backbone = require('backbone');
 var debug = require('debug')('backbone-promises');
-var when = whenLib = require('when');
+var whenLib = require('when');
 var _ = require('lodash');
 
 
@@ -61,22 +61,22 @@ var Promises = _.extend(Backbone.Events, {
   defer: whenLib.defer,
   wrap: function(opt) {
     opt = opt || {};
-    
-    var deferred = opt.deferred || when.defer();
+
+    var deferred = opt.deferred || whenLib.defer();
     var success = opt.success;
     var error = opt.error;
     opt.success = function() {
       debug("resolving");
       deferred.resolve.apply(deferred, arguments);
       if(success) success.apply(this, arguments);
-    }
+    };
     opt.error = function(model, err, resp) {
       debug("rejecting");
       deferred.reject(err);
       if(error) {
         error.call(this, model, err, resp);
       }
-    }
+    };
     if(!opt.deferred) {
       opt.deferred = deferred;
       opt.promise = deferred.promise;
