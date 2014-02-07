@@ -12,7 +12,6 @@ var Model = exports.Model = Backbone.Model.extend({
     debug('Model.Save');
     var opt, self = this;
     if(!options && (typeof val === "object" || typeof val === "undefined")) {
-      debug('wrapping val');
       opt = val = Promises.wrap(val);
     } else {
       opt = options = Promises.wrap(options);
@@ -20,7 +19,7 @@ var Model = exports.Model = Backbone.Model.extend({
     var validated = Backbone.Model.prototype.save.call(this, key, val, options);
     if(validated === false) {
       debug('Model validation failed');
-      opt.deferred.reject(this.validationError||new Error('validation failed'));
+      opt.error.call(this, this, this.validationError||new Error('validation failed'));
     }
     return opt.promise;
   },
@@ -61,10 +60,11 @@ var Promises = _.extend(Backbone.Events, {
   defer: whenLib.defer,
   wrap: function(opt) {
     opt = opt || {};
-
     var deferred = whenLib.defer();
+    var promise = deferred.promise;
     var success = opt.success;
     var error = opt.error;
+
     opt.success = function() {
       debug("resolving");
       deferred.resolve.apply(deferred, arguments);
@@ -77,10 +77,11 @@ var Promises = _.extend(Backbone.Events, {
         error.call(this, model, err, resp);
       }
     };
-//    if(!opt.deferred) {
-      opt.deferred = deferred;
-      opt.promise = deferred.promise;
-//    }
+    if(opt.promise) {
+      opt.promise = opt.promise.yield(promise);
+    } else {
+      opt.promise = promise;
+    }
     return opt;
   },
   Model: Model,
