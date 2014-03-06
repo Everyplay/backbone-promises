@@ -55,6 +55,7 @@ describe('#Collection', function() {
       assert(values[0].get('data') == "xyz");
       assert(values[1].get('data') == "zyx");
       assert(values[2].get('data') == "");
+      assert(a.length === 3);
       t();
     }, t);
   });

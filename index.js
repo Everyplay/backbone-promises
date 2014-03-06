@@ -8,6 +8,7 @@ var Model = exports.Model = Backbone.Model.extend({
   constructor: function() {
     return Backbone.Model.apply(this, arguments);
   },
+
   save: function(key, val, options) {
     debug('Model.Save');
     var opt, self = this;
@@ -23,12 +24,14 @@ var Model = exports.Model = Backbone.Model.extend({
     }
     return opt.promise;
   },
+
   fetch: function(options) {
     debug('Model.Fetch');
     options = Promises.wrap(options);
     Backbone.Model.prototype.fetch.call(this, options);
     return options.promise;
   },
+
   destroy: function(options) {
     debug('Model.Destroy');
     options = Promises.wrap(options);
@@ -41,12 +44,22 @@ var Collection = exports.Collection = Backbone.Collection.extend({
   constructor: function() {
     Backbone.Collection.apply(this, arguments);
   },
+
   create: function(model, options) {
-    debug('Collection.create model');
-    options = Promises.wrap(options);
-    Backbone.Collection.prototype.create.call(this, model, options);
-    return options.promise;
+  debug('Collection.create');
+    options = options ? _.clone(options) : {};
+    if (!(model = this._prepareModel(model, options))) return false;
+    if (!options.wait) this.add(model, options);
+    var collection = this;
+    var promise = model.save(null, options);
+    promise.done(function() {
+      collection.add(model, options);
+    }, function (err) {
+      return err;
+    });
+    return promise;
   },
+
   fetch: function(options) {
     debug('Collection.fetch');
     options = Promises.wrap(options);
@@ -70,8 +83,9 @@ var Promises = _.extend(Backbone.Events, {
       deferred.resolve.apply(deferred, arguments);
       if (success) success.apply(this, arguments);
     };
+
     opt.error = function(model, err, resp) {
-      debug("rejecting");
+      debug("rejecting", err);
       deferred.reject(err);
       if (error) {
         error.call(this, model, err, resp);
