@@ -11,15 +11,15 @@ var Model = exports.Model = Backbone.Model.extend({
   save: function(key, val, options) {
     debug('Model.Save');
     var opt, self = this;
-    if(!options && (typeof val === "object" || typeof val === "undefined")) {
+    if (!options && (typeof val === "object" || typeof val === "undefined")) {
       opt = val = Promises.wrap(val);
     } else {
       opt = options = Promises.wrap(options);
     }
     var validated = Backbone.Model.prototype.save.call(this, key, val, options);
-    if(validated === false) {
+    if (validated === false) {
       debug('Model validation failed');
-      opt.error.call(this, this, this.validationError||new Error('validation failed'));
+      opt.error.call(this, this, this.validationError || new Error('validation failed'));
     }
     return opt.promise;
   },
@@ -38,16 +38,16 @@ var Model = exports.Model = Backbone.Model.extend({
 });
 
 var Collection = exports.Collection = Backbone.Collection.extend({
-  constructor:function () {
+  constructor: function() {
     Backbone.Collection.apply(this, arguments);
   },
-  create :function (model, options) {
+  create: function(model, options) {
     debug('Collection.create model');
     options = Promises.wrap(options);
     Backbone.Collection.prototype.create.call(this, model, options);
     return options.promise;
   },
-  fetch:function (options) {
+  fetch: function(options) {
     debug('Collection.fetch');
     options = Promises.wrap(options);
     Backbone.Collection.prototype.fetch.call(this, options);
@@ -68,16 +68,16 @@ var Promises = _.extend(Backbone.Events, {
     opt.success = function() {
       debug("resolving");
       deferred.resolve.apply(deferred, arguments);
-      if(success) success.apply(this, arguments);
+      if (success) success.apply(this, arguments);
     };
     opt.error = function(model, err, resp) {
       debug("rejecting");
       deferred.reject(err);
-      if(error) {
+      if (error) {
         error.call(this, model, err, resp);
       }
     };
-    if(opt.promise) {
+    if (opt.promise) {
       opt.promise = opt.promise.yield(promise);
     } else {
       opt.promise = promise;

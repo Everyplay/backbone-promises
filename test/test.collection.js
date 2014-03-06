@@ -33,6 +33,11 @@ var MyCollection = Collection.extend({
 
 
 describe('#Collection', function() {
+  after(function(next) {
+    // catch unhandled errors
+    setTimeout(next, 500);
+  });
+
   it('should have deferred .create', function(t) {
     var a = new MyCollection();
     var m1 = a.create({id:1,data:"xyz"});
