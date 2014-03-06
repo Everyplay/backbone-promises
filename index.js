@@ -43,17 +43,20 @@ var Model = exports.Model = Backbone.Model.extend({
 var Collection = exports.Collection = Backbone.Collection.extend({
   constructor: function() {
     Backbone.Collection.apply(this, arguments);
+    this.on('invalid', this.handleInvalidModel);
   },
 
   create: function(model, options) {
     debug('Collection.create');
     options = options ? _.clone(options) : {};
-    if (!(model = this._prepareModel(model, options))) return false;
+    if (!(model = this._prepareModel(model, options))) {
+      return whenLib.reject(this.validationError);
+    }
     if (!options.wait) this.add(model, options);
     var collection = this;
     var promise = model.save(null, options);
     promise.done(function() {
-      collection.add(model, options);
+      if (options.wait) collection.add(model, options);
     }, function(err) {
       return err;
     });
@@ -65,6 +68,10 @@ var Collection = exports.Collection = Backbone.Collection.extend({
     options = Promises.wrap(options);
     Backbone.Collection.prototype.fetch.call(this, options);
     return options.promise;
+  },
+
+  handleInvalidModel: function(collection, validationError, options) {
+    this.validationError = validationError;
   }
 });
 
