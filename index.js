@@ -46,7 +46,7 @@ var Collection = exports.Collection = Backbone.Collection.extend({
   },
 
   create: function(model, options) {
-  debug('Collection.create');
+    debug('Collection.create');
     options = options ? _.clone(options) : {};
     if (!(model = this._prepareModel(model, options))) return false;
     if (!options.wait) this.add(model, options);
@@ -54,7 +54,7 @@ var Collection = exports.Collection = Backbone.Collection.extend({
     var promise = model.save(null, options);
     promise.done(function() {
       collection.add(model, options);
-    }, function (err) {
+    }, function(err) {
       return err;
     });
     return promise;
