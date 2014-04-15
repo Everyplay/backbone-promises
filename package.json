@@ -16,14 +16,14 @@
   },
   "license": "MIT",
   "devDependencies": {
-    "mocha": "~1.13.0",
+    "mocha": "~1.18",
     "backbone-db": "~0.4",
-    "chai": "~1.8.0"
+    "chai": "~1.9"
   },
   "dependencies": {
     "backbone": "~1.1.0",
     "debug": "~0.7.2",
-    "when": "~2.8.0",
+    "when": "~3.1",
     "lodash": "~2.4.1"
   }
 }
