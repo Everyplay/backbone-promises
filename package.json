@@ -1,6 +1,6 @@
 {
   "name": "backbone-promises",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "description": "Adds Promises/A+ support to backbone model and collection",
   "main": "index.js",
   "scripts": {
