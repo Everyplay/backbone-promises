@@ -1,7 +1,7 @@
 var assert = require('assert');
 var Model = require('../').Model;
 var Backbone = require('backdash');
-var Db = require('backbone-db');
+var Db = require('backbone-db-local');
 var Deferred = require('../');
 
 var debug = require('debug')('deferred');
