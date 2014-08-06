@@ -1,6 +1,6 @@
 var assert = require('assert');
 var Model = require('../').Model;
-var Backbone = require('backbone');
+var Backbone = require('backdash');
 var Db = require('backbone-db');
 var Deferred = require('../');
 

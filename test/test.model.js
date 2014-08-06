@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Backbone = require('backbone');
+var Backbone = require('backdash');
 var Model = require('../').Model;
 var Collection = require('../').Collection;
 var Db = require('backbone-db');
@@ -93,7 +93,7 @@ describe('#Model', function() {
               error: function(err) {
                 t();
               }
-            });
+            }).done(function() {},function() {}); // catch em 
           },
           error: function(err) {
             assert.ok(false);
@@ -113,23 +113,23 @@ describe('#Model', function() {
     }, t);
   });
 
-  it('Should be destroyable.', function(t) {
+  it('Should be destroyable.', function() {
     var m = new MyModel();
-    m.save({
+    return m.save({
       id: 123,
       asd: "asd"
     }).then(function() {
       assert.equal(m.get("id"), 123);
       return m.destroy().then(function() {
-        return m.fetch().then(t,
+        return m.fetch().then(function() {
+          assett(false);
+        },
           function(err) {
             assert(err instanceof(Error), 'It should return an error when not found');
             return when.resolve()
           });
       })
-    }).done(function() {
-      t();
-    }, t);
+    });
   });
 
   it('Should reject .save() promise on failed validation', function(done) {

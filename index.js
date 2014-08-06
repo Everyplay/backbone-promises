@@ -1,4 +1,4 @@
-var Backbone = require('backbone');
+var Backbone = require('backdash');
 var debug = require('debug')('backbone-promises');
 var whenLib = require('when');
 var _ = require('lodash');
@@ -98,11 +98,8 @@ var Promises = _.extend(Backbone.Events, {
         error.call(this, model, err, resp);
       }
     };
-    if (opt.promise) {
-      opt.promise = opt.promise.yield(promise);
-    } else {
-      opt.promise = promise;
-    }
+
+    opt.promise = promise;
     return opt;
   },
   Model: Model,

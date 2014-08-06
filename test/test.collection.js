@@ -1,5 +1,5 @@
 var assert = require('assert');
-var Backbone = require('backbone');
+var Backbone = require('backdash');
 var Model = require('../').Model;
 var Collection = require('../').Collection;
 var Db = require('backbone-db');
@@ -7,7 +7,7 @@ var debug = require('debug')('promises');
 var when = require('../').when;
 var db = Db("mycol");
 var expect = require('chai').expect
-var monitor = require('when/monitor/console');
+// var monitor = require('when/monitor/console');
 
 var MyModel = Model.extend({
   db: db,
@@ -61,7 +61,7 @@ describe('#Collection', function() {
       id: 3,
       data: ""
     }, {wait: true});
-    Backbone.Promises.when.join(m1, m2, m3).done(function(values) {
+    when.join(m1, m2, m3).done(function(values) {
       assert(values[0].get('data') == "xyz");
       assert(values[1].get('data') == "zyx");
       assert(values[2].get('data') == "");
