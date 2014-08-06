@@ -19,6 +19,7 @@
     "backbone-db": "^0.5.3",
     "backbone-db-local": "^0.5.2",
     "chai": "^1.9.1",
+    "jshint": "^2.5.2",
     "mocha": "^1.21.3"
   },
   "dependencies": {
