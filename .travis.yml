@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+  0.10
+notifications:
+  email: false
+  flowdock:
+    secure: "D9GEPWF1HApA1Ehk793KdWvZ5MkYkq9tUVz2xsU9C9/S/INeIotKdMLZOyM+JeeN+HnfLKPHyHDu5/CUn0WiH0zW3pk51BnGAeOplUVYbDdrdcm9GfBqlXTeB2TK88fk4StIFdeDjJaCErbOv7cC1YD9TDz8UTgLjcbRsVV8HlA="
+before_script: make jshint
+script:
+  - make test
